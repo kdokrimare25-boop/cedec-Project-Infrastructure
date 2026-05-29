@@ -1,15 +1,18 @@
-# Frontend stack — composes shared modules from infrastructure/modules/
+# Frontend stack — S3 + CloudFront for the Vite/React SPA
 
 module "cloudfront" {
   source = "../modules/cloudfront"
 
-  comment            = "${var.application}-${var.environment}"
-  origin_domain_name = var.origin_domain_name
-  origin_id          = "primary"
+  application = var.application
+  environment = var.environment
 
-  origin_access_control_id = var.origin_access_control_id
-  aliases                  = var.cloudfront_aliases
-  acm_certificate_arn      = var.acm_certificate_arn
+  bucket_name       = var.bucket_name
+  force_destroy     = var.force_destroy
+  enable_versioning = var.enable_versioning
+
+  aliases             = var.cloudfront_aliases
+  acm_certificate_arn = var.acm_certificate_arn
+  enable_spa_routing  = var.enable_spa_routing
 
   tags = {
     Component = "cloudfront"

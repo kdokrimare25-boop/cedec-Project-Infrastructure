@@ -1,66 +1,62 @@
 # CloudFront module
 
-Creates one **Amazon CloudFront distribution** for frontend traffic (static site or custom origin).
+Creates an **S3 + CloudFront** static frontend stack for the Vite/React SPA in [`application/frontend/`](../../../application/frontend/).
 
-## What this module does
+## What this module creates
 
-- Single origin (S3 with OAC, or custom origin such as ALB)
-- Default cache behavior using the AWS **CachingOptimized** managed cache policy
-- Optional custom domain names (`aliases`) with ACM certificate in **us-east-1**
-- HTTPS redirect for viewers by default
+- Private **S3 bucket** (AES256 encryption, public access blocked)
+- **Origin Access Control** (OAC) so only CloudFront can read the bucket
+- **S3 bucket policy** scoped to the CloudFront distribution ARN
+- **CloudFront distribution** with CachingOptimized policy and HTTPS redirect
+- **SPA routing**: 403/404 responses return `index.html` with HTTP 200 (React Router)
 
-## What this module does not do
+## Deploy workflow
 
-- S3 buckets, bucket policies, or Origin Access Control resources (pass `origin_access_control_id` from your root module when ready)
-- ACM certificate creation (create in us-east-1, pass ARN)
-- WAF, Lambda@Edge, or additional cache behaviors
+1. `terraform apply` in [`infrastructure/frontend/`](../../frontend/)
+2. Build the app: `cd application/frontend && npm run build`
+3. Sync `dist/` to the bucket:
+
+```bash
+aws s3 sync application/frontend/dist/ s3://<bucket_name>/ --delete
+aws cloudfront create-invalidation \
+  --distribution-id <distribution_id> \
+  --paths "/*"
+```
+
+Use the `s3_bucket_name` and `cloudfront_distribution_id` outputs from the frontend stack.
 
 ## Usage
 
-### Custom origin (no S3 OAC)
-
 ```hcl
-module "cdn" {
+module "cloudfront" {
   source = "../modules/cloudfront"
 
-  comment              = "dev frontend"
-  origin_domain_name   = "my-origin.example.com"
-  origin_id            = "primary"
-  origin_protocol_policy = "https-only"
+  application = "cdec-frontend"
+  environment = "dev"
+
+  aliases             = ["www.example.com"]
+  acm_certificate_arn = var.acm_certificate_arn
+
   tags = {
-    Environment = "dev"
-    Application = "cdec-frontend"
+    Component = "cloudfront"
   }
-}
-```
-
-### S3 origin with Origin Access Control
-
-```hcl
-module "cdn" {
-  source = "../modules/cloudfront"
-
-  origin_domain_name         = aws_s3_bucket.site.bucket_regional_domain_name
-  origin_access_control_id   = aws_cloudfront_origin_access_control.site.id
-  aliases                    = ["www.example.com"]
-  acm_certificate_arn        = var.acm_certificate_arn
-  tags                       = var.tags
 }
 ```
 
 ## Inputs
 
-See [variables.tf](variables.tf) for the full list. Required input: `origin_domain_name`.
+See [variables.tf](variables.tf). Required: `application`, `environment`.
 
 ## Outputs
 
 | Output | Use |
 |--------|-----|
+| `bucket_id` | `aws s3 sync` target |
+| `distribution_id` | Cache invalidation after deploy |
 | `domain_name` | Alias target for Route 53 |
-| `hosted_zone_id` | Alias zone ID for Route 53 (from CloudFront) |
-| `distribution_id` | Cache invalidation |
+| `hosted_zone_id` | Alias zone ID for Route 53 |
 
 ## Notes
 
-- ACM certificates for CloudFront must be in **us-east-1**, regardless of where you run Terraform.
+- ACM certificates for CloudFront custom domains must be in **us-east-1**.
 - Pair with the [Route53 module](../route53/README.md) using `domain_name` and `hosted_zone_id` outputs.

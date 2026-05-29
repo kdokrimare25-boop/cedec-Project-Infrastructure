@@ -1,3 +1,13 @@
+output "s3_bucket_name" {
+  description = "S3 bucket for frontend build artifacts (sync dist/ here)."
+  value       = module.cloudfront.bucket_id
+}
+
+output "s3_bucket_arn" {
+  description = "S3 bucket ARN."
+  value       = module.cloudfront.bucket_arn
+}
+
 output "cloudfront_domain_name" {
   description = "CloudFront domain name (alias target for DNS)."
   value       = module.cloudfront.domain_name

@@ -1,5 +1,25 @@
+output "bucket_id" {
+  description = "S3 bucket name (ID)."
+  value       = aws_s3_bucket.this.id
+}
+
+output "bucket_arn" {
+  description = "S3 bucket ARN."
+  value       = aws_s3_bucket.this.arn
+}
+
+output "bucket_regional_domain_name" {
+  description = "S3 bucket regional domain name (CloudFront origin)."
+  value       = aws_s3_bucket.this.bucket_regional_domain_name
+}
+
+output "origin_access_control_id" {
+  description = "Origin Access Control ID for the S3 origin."
+  value       = aws_cloudfront_origin_access_control.this.id
+}
+
 output "distribution_id" {
-  description = "CloudFront distribution ID (used for cache invalidation and some integrations)."
+  description = "CloudFront distribution ID (used for cache invalidation)."
   value       = aws_cloudfront_distribution.this.id
 }
 
@@ -9,12 +29,12 @@ output "distribution_arn" {
 }
 
 output "domain_name" {
-  description = "CloudFront domain name to use as an alias target in Route 53 (e.g. d111111abcdef8.cloudfront.net)."
+  description = "CloudFront domain name to use as an alias target in Route 53."
   value       = aws_cloudfront_distribution.this.domain_name
 }
 
 output "hosted_zone_id" {
-  description = "Route 53 hosted zone ID for CloudFront alias records (constant per region: Z2FDTNDATAQYW2)."
+  description = "Route 53 hosted zone ID for CloudFront alias records."
   value       = aws_cloudfront_distribution.this.hosted_zone_id
 }
 

@@ -1,7 +1,7 @@
 variable "aws_region" {
-  description = "AWS region for Route 53 and regional resources. ACM for CloudFront must be in us-east-1."
+  description = "AWS region for S3 and regional resources. ACM for CloudFront must be in us-east-1."
   type        = string
-  default     = "us-east-1"
+  default     = "eu-west-1"
 }
 
 variable "environment" {
@@ -16,15 +16,28 @@ variable "application" {
   default     = "cdec-frontend"
 }
 
-variable "origin_domain_name" {
-  description = "Origin hostname for CloudFront (S3 regional domain or custom origin)."
-  type        = string
-}
-
-variable "origin_access_control_id" {
-  description = "OAC ID when using a private S3 origin. Leave null for custom origins."
+variable "bucket_name" {
+  description = "Globally unique S3 bucket name. Leave null to use {application}-{environment}-frontend."
   type        = string
   default     = null
+}
+
+variable "force_destroy" {
+  description = "Allow Terraform to delete the frontend bucket when it contains objects."
+  type        = bool
+  default     = false
+}
+
+variable "enable_versioning" {
+  description = "Enable S3 versioning on the frontend bucket."
+  type        = bool
+  default     = false
+}
+
+variable "enable_spa_routing" {
+  description = "Serve index.html for 403/404 responses (React client-side routing)."
+  type        = bool
+  default     = true
 }
 
 variable "cloudfront_aliases" {

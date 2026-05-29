@@ -1,6 +1,6 @@
 # Frontend stack
 
-Terraform root for the frontend (CloudFront + Route 53). Calls shared modules in [`../modules/`](../modules/).
+Terraform root for the frontend (**S3 + CloudFront + Route 53**). Calls shared modules in [`../modules/`](../modules/).
 
 ## Layout
 
@@ -8,7 +8,7 @@ Terraform root for the frontend (CloudFront + Route 53). Calls shared modules in
 frontend/
 ├── Jenkinsfile
 ├── backend.tf              # S3 remote state (partial config)
-├── backend.hcl.example       # Copy to backend.hcl (gitignored)
+├── backend.hcl.example     # Copy to backend.hcl (gitignored)
 ├── main.tf
 ├── variables.tf
 ├── outputs.tf
@@ -36,8 +36,23 @@ terraform plan
 ## Module sources
 
 ```hcl
-module "cloudfront" { source = "../modules/cloudfront" }
+module "cloudfront" { source = "../modules/cloudfront" }  # S3 + CloudFront
 module "route53"   { source = "../modules/route53" }
+```
+
+## Deploy the application
+
+After `terraform apply`:
+
+```bash
+cd application/frontend
+npm ci && npm run build
+
+BUCKET=$(terraform -chdir=../../infrastructure/frontend output -raw s3_bucket_name)
+DIST_ID=$(terraform -chdir=../../infrastructure/frontend output -raw cloudfront_distribution_id)
+
+aws s3 sync dist/ "s3://${BUCKET}/" --delete
+aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/*"
 ```
 
 ## Jenkins

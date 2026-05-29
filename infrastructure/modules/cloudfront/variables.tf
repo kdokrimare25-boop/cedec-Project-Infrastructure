@@ -1,5 +1,39 @@
+variable "application" {
+  description = "Application identifier used in naming and tags."
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment name used in naming and tags."
+  type        = string
+}
+
+variable "name_prefix" {
+  description = "Override for resource name prefix. Defaults to {application}-{environment}."
+  type        = string
+  default     = null
+}
+
+variable "bucket_name" {
+  description = "S3 bucket name for frontend assets. Must be globally unique. Defaults to {name_prefix}-frontend."
+  type        = string
+  default     = null
+}
+
+variable "force_destroy" {
+  description = "Allow Terraform to delete the bucket even when it contains objects."
+  type        = bool
+  default     = false
+}
+
+variable "enable_versioning" {
+  description = "Enable S3 object versioning on the frontend bucket."
+  type        = bool
+  default     = false
+}
+
 variable "enabled" {
-  description = "Whether the distribution is enabled."
+  description = "Whether the CloudFront distribution is enabled."
   type        = bool
   default     = true
 }
@@ -7,7 +41,7 @@ variable "enabled" {
 variable "comment" {
   description = "Comment shown in the AWS console for this distribution."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "aliases" {
@@ -27,38 +61,16 @@ variable "acm_certificate_arn" {
   }
 }
 
-variable "origin_domain_name" {
-  description = "DNS name of the origin (S3 bucket regional domain name or custom origin hostname)."
-  type        = string
-}
-
-variable "origin_id" {
-  description = "Unique identifier for this origin within the distribution. Referenced by cache behaviors."
-  type        = string
-  default     = "primary"
-}
-
-variable "origin_access_control_id" {
-  description = "Origin Access Control (OAC) ID for private S3 origins. Leave null for custom (non-S3) origins."
-  type        = string
-  default     = null
-}
-
-variable "origin_protocol_policy" {
-  description = "How CloudFront connects to a custom origin when OAC is not used."
-  type        = string
-  default     = "https-only"
-
-  validation {
-    condition     = contains(["http-only", "https-only", "match-viewer"], var.origin_protocol_policy)
-    error_message = "origin_protocol_policy must be http-only, https-only, or match-viewer."
-  }
-}
-
 variable "default_root_object" {
-  description = "Object returned for root URL requests (common for static sites), e.g. index.html."
+  description = "Object returned for root URL requests, e.g. index.html."
   type        = string
   default     = "index.html"
+}
+
+variable "enable_spa_routing" {
+  description = "Return index.html with HTTP 200 for 403/404 errors (client-side routing)."
+  type        = bool
+  default     = true
 }
 
 variable "viewer_protocol_policy" {
@@ -126,7 +138,7 @@ variable "minimum_protocol_version" {
 }
 
 variable "tags" {
-  description = "Tags applied to the CloudFront distribution."
+  description = "Additional tags applied to S3 and CloudFront resources."
   type        = map(string)
   default     = {}
 }
