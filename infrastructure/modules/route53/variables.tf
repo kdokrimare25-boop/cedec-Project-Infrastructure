@@ -15,12 +15,20 @@ variable "name_prefix" {
 }
 
 variable "zone_name" {
-  description = "DNS zone name to create (e.g. example.com). Required when zone_id is not set."
+  description = "DNS zone name to create — must be a domain you own. Required when zone_id is not set."
   type        = string
 
   validation {
     condition     = var.zone_id != null || (var.zone_name != null && var.zone_name != "")
     error_message = "zone_name is required when zone_id is not set (module creates a new hosted zone)."
+  }
+
+  validation {
+    condition = var.zone_id != null || !contains(
+      ["example.com", "example.net", "example.org"],
+      lower(trimsuffix(var.zone_name, "."))
+    )
+    error_message = "zone_name cannot be example.com, example.net, or example.org — AWS reserves these for documentation and rejects hosted zone creation."
   }
 }
 
