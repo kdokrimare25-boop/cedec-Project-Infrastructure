@@ -27,9 +27,10 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                dir(env.TF_DIR) {
-                    sh 'terraform init -input=false'
-                }
+                    dir(env.TF_DIR) {
+                        sh 'terraform init -input=false'
+                    }
+                } 
             }
         }
 
@@ -71,5 +72,4 @@ pipeline {
             }
         }
     }
-}
 }
