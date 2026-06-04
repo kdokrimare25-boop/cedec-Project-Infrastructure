@@ -67,6 +67,12 @@ resource "aws_eks_cluster" "this" {
 
   enabled_cluster_log_types = var.enabled_cluster_log_types
 
+  # API_AND_CONFIG_MAP supports access entries (recommended) and legacy aws-auth during migration.
+  access_config {
+    authentication_mode                         = var.cluster_authentication_mode
+    bootstrap_cluster_creator_admin_permissions = var.bootstrap_cluster_creator_admin_permissions
+  }
+
   tags = merge(
     local.base_tags,
     {

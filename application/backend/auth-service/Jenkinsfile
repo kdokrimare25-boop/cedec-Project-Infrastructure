@@ -4,6 +4,8 @@
 // AWS credential in Jenkins (e.g. aws-frontend-terraform):
 //   ecr:GetAuthorizationToken, ecr:BatchCheckLayerAvailability, ecr:PutImage, ecr:InitiateLayerUpload, ecr:UploadLayerPart, ecr:CompleteLayerUpload
 //   eks:DescribeCluster (for update-kubeconfig)
+// EKS access: IAM principal must be in infrastructure/backend terraform.tfvars
+//   cluster_admin_principal_arns (see backend README — kubectl access)
 
 pipeline {
     agent {

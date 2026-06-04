@@ -61,6 +61,11 @@ output "cluster_iam_role_arn" {
   value       = aws_iam_role.cluster.arn
 }
 
+output "cluster_admin_principal_arns" {
+  description = "IAM principal ARNs granted cluster admin via EKS access entries."
+  value       = local.cluster_admin_principal_arns
+}
+
 output "node_iam_role_arn" {
   description = "IAM role ARN used by worker nodes."
   value       = aws_iam_role.node.arn

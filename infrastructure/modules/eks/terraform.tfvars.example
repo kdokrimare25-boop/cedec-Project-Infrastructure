@@ -21,3 +21,9 @@ cluster_endpoint_private_access = true
 cluster_endpoint_public_access_cidrs = ["203.0.113.0/32"] # your VPN/office CIDR in prod
 
 enable_cluster_autoscaler_tags = true
+
+# IAM ARNs for kubectl (users or roles). Required for API / API_AND_CONFIG_MAP auth.
+cluster_admin_principal_arns = [
+  "arn:aws:iam::ACCOUNT_ID:user/deploy-user",
+]
+include_caller_as_cluster_admin = true

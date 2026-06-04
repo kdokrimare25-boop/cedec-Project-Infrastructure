@@ -42,5 +42,8 @@ module "eks" {
   enable_cluster_autoscaler_tags = var.enable_cluster_autoscaler_tags
   additional_tags                = var.additional_tags
 
+  cluster_admin_principal_arns  = var.cluster_admin_principal_arns
+  include_caller_as_cluster_admin = var.include_caller_as_cluster_admin
+
   depends_on = [module.vpc]
 }

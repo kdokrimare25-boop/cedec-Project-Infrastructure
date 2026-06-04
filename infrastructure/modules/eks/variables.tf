@@ -145,3 +145,32 @@ variable "additional_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "cluster_authentication_mode" {
+  description = "EKS cluster authentication mode. Use API_AND_CONFIG_MAP when migrating an existing cluster; API for new clusters only."
+  type        = string
+  default     = "API_AND_CONFIG_MAP"
+
+  validation {
+    condition     = contains(["API", "API_AND_CONFIG_MAP", "CONFIG_MAP"], var.cluster_authentication_mode)
+    error_message = "cluster_authentication_mode must be API, API_AND_CONFIG_MAP, or CONFIG_MAP."
+  }
+}
+
+variable "bootstrap_cluster_creator_admin_permissions" {
+  description = "Grant cluster admin to the IAM principal that creates the cluster. Only effective at cluster creation; leave false for existing clusters."
+  type        = bool
+  default     = false
+}
+
+variable "cluster_admin_principal_arns" {
+  description = "IAM user or role ARNs granted AmazonEKSClusterAdminPolicy (kubectl / CI deploy principals)."
+  type        = list(string)
+  default     = []
+}
+
+variable "include_caller_as_cluster_admin" {
+  description = "Grant cluster admin to the IAM principal running Terraform (e.g. Jenkins aws-frontend-terraform user)."
+  type        = bool
+  default     = true
+}

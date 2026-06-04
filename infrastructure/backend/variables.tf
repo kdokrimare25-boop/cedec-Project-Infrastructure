@@ -118,3 +118,15 @@ variable "enable_cluster_autoscaler_tags" {
   type        = bool
   default     = true
 }
+
+variable "cluster_admin_principal_arns" {
+  description = "IAM ARNs allowed to run kubectl against the cluster (Jenkins user, EC2 instance role, etc.)."
+  type        = list(string)
+  default     = []
+}
+
+variable "include_caller_as_cluster_admin" {
+  description = "Grant cluster admin to the IAM principal that runs Terraform apply."
+  type        = bool
+  default     = true
+}

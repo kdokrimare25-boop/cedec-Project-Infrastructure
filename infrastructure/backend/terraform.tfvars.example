@@ -1,11 +1,10 @@
 # Copy to terraform.tfvars. Do not commit terraform.tfvars.
 
 aws_region   = "eu-west-1"
-environment  = "devv"
+environment  = "dev"
 project_name = "cdec-alpha"
 cluster_name = "cdec-eks-dev"
 
-# VPC — change AZ names for your region
 vpc_cidr             = "10.0.0.0/16"
 public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
@@ -13,9 +12,8 @@ availability_zones   = ["eu-west-1a", "eu-west-1b"]
 
 single_nat_gateway = true
 
-# EKS
-kubernetes_version  = "1.34"
-node_instance_types = ["c7i-flex.large"]
+kubernetes_version  = null
+node_instance_types = ["t3.medium"]
 desired_size        = 2
 min_size            = 1
 max_size            = 3
@@ -24,8 +22,14 @@ cluster_endpoint_public_access       = true
 cluster_endpoint_private_access      = true
 cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
 
-# kubectl: run `aws sts get-caller-identity --query Arn` on the Jenkins/EC2 host and add below
-cluster_admin_principal_arns = []
+# kubectl / Jenkins: add every IAM principal that runs aws eks update-kubeconfig.
+# On the host: aws sts get-caller-identity --query Arn --output text
+cluster_admin_principal_arns = [
+  "arn:aws:iam::439055361064:user/YOUR_IAM_USER",
+  # "arn:aws:iam::439055361064:role/YOUR_EC2_INSTANCE_ROLE",
+]
+
+# When true, Terraform apply also grants admin to its own IAM principal (Jenkins apply user).
 include_caller_as_cluster_admin = true
 
 additional_tags = {
