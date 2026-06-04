@@ -49,8 +49,3 @@ output "availability_zones" {
   description = "AZs used by subnets — pass to EKS for multi-AZ node groups."
   value       = var.availability_zones
 }
-
-output "private_route_table_ids" {
-  description = "Private route table IDs (one when single_nat_gateway, otherwise one per AZ)."
-  value       = aws_route_table.private[*].id
-}

@@ -40,10 +40,6 @@ locals {
   # First AZ is used when single_nat_gateway = true (NAT lives in a public subnet)
   first_az = var.availability_zones[0]
 
-  # One private route table per NAT (single NAT => one shared table for all private subnets)
-  nat_gateway_count         = var.single_nat_gateway ? 1 : length(var.availability_zones)
-  private_route_table_count = local.nat_gateway_count
-
   # Naming prefix keeps resources identifiable in the AWS console
   name_prefix = "${var.project_name}-${var.environment}"
 }
@@ -197,35 +193,26 @@ resource "aws_route_table_association" "public" {
 # -----------------------------------------------------------------------------
 
 resource "aws_route_table" "private" {
-  count = local.private_route_table_count
+  for_each = var.single_nat_gateway ? toset(["default"]) : toset(var.availability_zones)
 
   vpc_id = aws_vpc.this.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = var.single_nat_gateway ? aws_nat_gateway.this[local.first_az].id : aws_nat_gateway.this[var.availability_zones[count.index]].id
+    nat_gateway_id = var.single_nat_gateway ? aws_nat_gateway.this[local.first_az].id : aws_nat_gateway.this[each.key].id
   }
 
   tags = merge(
     local.base_tags,
     {
-      Name = var.single_nat_gateway ? "${local.name_prefix}-private-rt" : "${local.name_prefix}-private-rt-${var.availability_zones[count.index]}"
+      Name = var.single_nat_gateway ? "${local.name_prefix}-private-rt" : "${local.name_prefix}-private-rt-${each.key}"
     }
   )
-
-  depends_on = [aws_nat_gateway.this]
 }
 
 resource "aws_route_table_association" "private" {
   for_each = aws_subnet.private
 
   subnet_id      = each.value.id
-  route_table_id = var.single_nat_gateway ? aws_route_table.private[0].id : aws_route_table.private[index(var.availability_zones, each.key)].id
-
-  depends_on = [aws_route_table.private]
-}
-
-moved {
-  from = aws_route_table.private["default"]
-  to   = aws_route_table.private[0]
+  route_table_id = var.single_nat_gateway ? aws_route_table.private["default"].id : aws_route_table.private[each.key].id
 }

@@ -1,9 +1,9 @@
 # Copy to terraform.tfvars. Do not commit terraform.tfvars.
 
 aws_region   = "eu-west-1"
-environment  = "dev"
-project_name = "cdec"
-cluster_name = "cdec-eks"
+environment  = "devv"
+project_name = "cdec-alpha"
+cluster_name = "cdec-eks-dev"
 
 # VPC — change AZ names for your region
 vpc_cidr             = "10.0.0.0/16"
