@@ -29,7 +29,7 @@ pipeline {
         EKS_CLUSTER = 'cdec-eks-dev'
         EKS_REGION = 'eu-west-1'
         K8S_DIR = 'application/backend/k8s'
-        KUBE_NAMESPACE = 'cloudblitz'
+        KUBE_NAMESPACE = 'default'
     }
 
     stages {
@@ -55,6 +55,8 @@ pipeline {
                         sh """
                             export AWS_DEFAULT_REGION=${env.EKS_REGION}
                             aws eks update-kubeconfig --region ${env.EKS_REGION} --name ${env.EKS_CLUSTER}
+
+                            kubectl create namespace ${KUBE_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
 
                             sed "s|__INGRESS_HOST__|${params.INGRESS_HOST}|g" ingress.yml > ingress.generated.yml
                             kubectl apply -f ingress.generated.yml -n ${KUBE_NAMESPACE}
