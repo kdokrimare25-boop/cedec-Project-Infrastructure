@@ -4,8 +4,8 @@
 // AWS credential: aws-frontend-terraform (eks:DescribeCluster for update-kubeconfig)
 // EKS access: IAM principal in infrastructure/backend terraform.tfvars cluster_admin_iam_role_names
 //
-// Prerequisite: NGINX Ingress Controller installed on cdec-eks-dev
-//   kubectl get ingressclass nginx
+// Prerequisite: AWS Load Balancer Controller installed on cdec-eks-dev
+// Services must exist in the cloudblitz namespace (same namespace as this ingress)
 
 pipeline {
     agent {
@@ -29,6 +29,7 @@ pipeline {
         EKS_CLUSTER = 'cdec-eks-dev'
         EKS_REGION = 'eu-west-1'
         K8S_DIR = 'application/backend/k8s'
+        KUBE_NAMESPACE = 'cloudblitz'
     }
 
     stages {
@@ -55,9 +56,11 @@ pipeline {
                             export AWS_DEFAULT_REGION=${env.EKS_REGION}
                             aws eks update-kubeconfig --region ${env.EKS_REGION} --name ${env.EKS_CLUSTER}
 
+                            kubectl create namespace ${KUBE_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+
                             sed "s|__INGRESS_HOST__|${params.INGRESS_HOST}|g" ingress.yml > ingress.generated.yml
-                            kubectl apply -f ingress.generated.yml -n default
-                            kubectl get ingress backend-ingress -n default
+                            kubectl apply -f ingress.generated.yml -n ${KUBE_NAMESPACE}
+                            kubectl get ingress cloudblitz-api-ingress -n ${KUBE_NAMESPACE}
                         """
                     }
                 }
@@ -80,7 +83,7 @@ pipeline {
                             export AWS_DEFAULT_REGION=${env.EKS_REGION}
                             aws eks update-kubeconfig --region ${env.EKS_REGION} --name ${env.EKS_CLUSTER}
 
-                            kubectl delete ingress backend-ingress -n default --ignore-not-found
+                            kubectl delete ingress cloudblitz-api-ingress -n ${KUBE_NAMESPACE} --ignore-not-found
                         """
                     }
                 }
