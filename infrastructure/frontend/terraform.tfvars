@@ -10,5 +10,5 @@ application = "cdec-alpha-frontend"
 # acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/..."
 
 # Use a domain you own — example.com is reserved by AWS and will fail
-dns_zone_name   = "cloudnine.in"
-dns_record_name = "www.cloudnine.in"
+dns_zone_name   = "thecloudnine.in"
+dns_record_name = "www.thecloudnine.in"
