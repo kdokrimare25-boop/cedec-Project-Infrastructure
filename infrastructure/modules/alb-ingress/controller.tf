@@ -56,35 +56,32 @@ resource "helm_release" "aws_load_balancer_controller" {
   wait    = true
   timeout = 600
 
-  set {
-    name  = "clusterName"
-    value = var.cluster_name
-  }
-
-  set {
-    name  = "region"
-    value = var.aws_region
-  }
-
-  set {
-    name  = "vpcId"
-    value = var.vpc_id
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = var.controller_service_account_name
-  }
-
-  set {
-    name  = "crds.create"
-    value = "false"
-  }
+  set = [
+    {
+      name  = "clusterName"
+      value = var.cluster_name
+    },
+    {
+      name  = "region"
+      value = var.aws_region
+    },
+    {
+      name  = "vpcId"
+      value = var.vpc_id
+    },
+    {
+      name  = "serviceAccount.create"
+      value = "false"
+    },
+    {
+      name  = "serviceAccount.name"
+      value = var.controller_service_account_name
+    },
+    {
+      name  = "crds.create"
+      value = "false"
+    },
+  ]
 
   depends_on = [
     aws_iam_role_policy_attachment.load_balancer_controller,
