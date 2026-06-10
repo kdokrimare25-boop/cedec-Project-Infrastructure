@@ -4,7 +4,7 @@ aws_region  = "eu-west-1"
 environment = "dev"
 application = "cdec-alpha"
 
-#acm_certificate_arn = "arn:aws:acm:us-east-1:439055361064:certificate/0024a125-a31e-43ea-8935-ecabcdd2f8f6"
+acm_certificate_arn = "arn:aws:acm:eu-west-1:933516006319:certificate/dab4d476-ddf2-40ef-ae09-0d3ced0e76e1"
 
 # Use a domain you own — example.com is reserved by AWS and will fail
 dns_zone_name   = "thecloudnine.in"
