@@ -8,18 +8,18 @@
 
 pipeline {
     agent {
-        label 'node'
+        label 'terraform'
     }
 
     parameters {
         string(
             name: 'S3_BUCKET',
-            defaultValue: 'cdec-alpha-frontend-dev-frontend',
+            defaultValue: 'cdec-alpha-dev-frontend',
             description: 'S3 bucket name for the frontend (e.g. cdec-frontend-dev-frontend)'
         )
         string(
             name: 'CLOUDFRONT_DISTRIBUTION_ID',
-            defaultValue: 'E2191Y8O3EGPFM',
+            defaultValue: 'E2T929LQJJ7AIS',
             description: 'CloudFront distribution ID (e.g. E1234567890ABC)'
         )
         string(
