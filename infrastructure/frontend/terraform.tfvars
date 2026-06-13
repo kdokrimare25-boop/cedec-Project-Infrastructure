@@ -4,7 +4,7 @@ aws_region  = "eu-north-1"
 environment = "dev"
 application = "cdec-alpha-d"
 
-acm_certificate_arn = "arn:aws:acm:us-east-1:072929087802:certificate/6d0b49e3-641c-40d1-a290-e65ec5f82982"
+acm_certificate_arn = "arn:aws:acm:us-east-1:329504364887:certificate/bf9084f6-550e-4b97-b7e5-45d966320b18"
 
 # Use a domain you own — example.com is reserved by AWS and will fail
 dns_zone_name   = "awsproject.shop"
