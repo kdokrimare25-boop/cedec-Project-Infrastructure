@@ -110,21 +110,6 @@ pipeline {
         }
     }
 
-    stage('AWS Test') {
-    steps {
-        withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: 'aws-frontend-terraform',
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-        ]]) {
-            sh '''
-            aws sts get-caller-identity
-            '''
-        }
-    }
-}
-
     post {
         success {
             echo 'Frontend deployed successfully!'
