@@ -41,14 +41,14 @@ pipeline {
 
     environment {
         APP_DIR = 'application/frontend'
-        AWS_DEFAULT_REGION = 'eu-north-1'
+        AWS_DEFAULT_REGION = 'eu-north-1' 
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/kdokrimare25-boop/cedec-Project-Infrastructure.git', branch: 'main'
+                git url: 'https://github.com/kdokrimare25-boop/cdec-Project-Infrastructure.git', branch: 'main'
             }
         }
 

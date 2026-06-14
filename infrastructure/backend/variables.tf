@@ -3,7 +3,7 @@
 variable "aws_region" {
   description = "AWS region for VPC and EKS."
   type        = string
-  default     = "us-east-1"
+  default     = "eu-north-1"
 }
 
 variable "environment" {
@@ -68,7 +68,7 @@ variable "kubernetes_version" {
 variable "node_instance_types" {
   description = "EC2 instance types for the node group."
   type        = list(string)
-  default     = ["t3.medium"]
+  default     = ["t3.2xlarge"]
 }
 
 variable "desired_size" {
