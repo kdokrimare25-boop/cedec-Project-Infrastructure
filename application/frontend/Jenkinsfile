@@ -14,7 +14,7 @@ pipeline {
     parameters {
         string(
             name: 'S3_BUCKET',
-            defaultValue: 'cdec-alpha-dev-frontend',
+            defaultValue: 'cdec-alpha-dev-frontend-d',
             description: 'S3 bucket name for the frontend (e.g. cdec-frontend-dev-frontend)'
         )
         string(
@@ -109,6 +109,21 @@ pipeline {
             }
         }
     }
+
+    stage('AWS Test') {
+    steps {
+        withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws-frontend-terraform',
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+            sh '''
+            aws sts get-caller-identity
+            '''
+        }
+    }
+}
 
     post {
         success {
