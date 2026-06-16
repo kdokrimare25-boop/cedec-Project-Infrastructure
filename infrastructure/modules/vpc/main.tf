@@ -10,7 +10,7 @@
 locals {
   # Common tags on every resource (dynamic merge with caller-provided tags)
   base_tags = merge(
-    {
+    { 
       Environment = var.environment
       Project     = var.project_name
       ManagedBy   = "terraform"
