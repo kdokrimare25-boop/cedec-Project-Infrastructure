@@ -1,0 +1,88 @@
+pipeline {
+    agent {
+        label 'terraform'
+}
+
+```
+environment {
+    EKS_CLUSTER = 'cdec-eks-dev'
+    EKS_REGION  = 'eu-north-1'
+    AWS_ACCOUNT_ID = '329504364887'
+    ECR_REPO = 'backend/enrollment-service'
+}
+
+stages {
+
+    stage('Checkout') {
+        steps {
+            git url: 'https://github.com/kdokrimare25-boop/cdec-Project-Infrastructure.git', branch: 'main'
+        }
+    }
+
+    stage('Build Docker Image') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('application/backend/enrollment-service') {
+                sh '''
+                    docker build -t 329504364887.dkr.ecr.eu-north-1.amazonaws.com/backend/enrollment-service:latest .
+                '''    
+            }
+        }
+    }
+
+    stage('Push to ECR') {
+        agent {
+            label 'master'
+        }
+        steps {
+            withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: 'aws-frontend-terraform',
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+            ]]) {
+                sh '''
+                    aws ecr get-login-password --region ${EKS_REGION} | \
+                    docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${EKS_REGION}.amazonaws.com
+
+                    docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${EKS_REGION}.amazonaws.com/${ECR_REPO}:latest
+                '''
+            }
+        }
+    }
+
+    stage('Deploy to EKS') {
+        steps {
+            withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: 'aws-frontend-terraform',
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+            ]]) {
+                dir('application/backend/enrollment-service') {
+                    sh '''
+                        aws eks update-kubeconfig --region ${EKS_REGION} --name ${EKS_CLUSTER}
+
+                        kubectl apply -f k8s/deployment.yml -n default
+                        kubectl rollout restart deployment/enrollment-service -n default
+                        kubectl rollout status deployment/enrollment-service -n default --timeout=300s
+                    '''
+                }
+            }
+        }
+    }
+}
+
+post {
+    success {
+        echo 'enrollment-service deployed successfully!'
+    }
+    failure {
+        echo 'enrollment-service deployment failed. Check logs.'
+    }
+}
+```
+
+}
