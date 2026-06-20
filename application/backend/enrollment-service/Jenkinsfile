@@ -1,9 +1,9 @@
+//groovy
 pipeline {
     agent {
         label 'terraform'
-}
+    }
 
-```
 environment {
     EKS_CLUSTER = 'cdec-eks-dev'
     EKS_REGION  = 'eu-north-1'
@@ -81,8 +81,6 @@ post {
     }
     failure {
         echo 'enrollment-service deployment failed. Check logs.'
-    }
-}
-```
-
+         }
+    }`
 }
