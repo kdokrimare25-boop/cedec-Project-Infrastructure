@@ -82,5 +82,5 @@ post {
     failure {
         echo 'enrollment-service deployment failed. Check logs.'
          }
-    }`
+    }
 }
